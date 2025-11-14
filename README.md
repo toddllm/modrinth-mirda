@@ -81,16 +81,16 @@ GitHub Actions will automatically build and create a release with the JAR file.
 ./gradlew runServer
 ```
 
-### Production Server (Railway)
-Deploy a public Minecraft server with the Mirda mod to Railway:
+### Production Server (Render)
+Deploy a public Minecraft server with the Mirda mod to Render:
 
-1. **Quick Deploy**: [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template)
+1. **Quick Deploy**: Use Render Blueprint from `render.yaml`
 
 2. **Manual Setup**: See [DEPLOYMENT.md](DEPLOYMENT.md) for complete guide
 
 **Requirements:**
-- Railway account (free tier available)
-- 4GB+ RAM recommended
+- Render account (free tier: 750hrs/month)
+- Standard plan ($25/month for 4GB RAM)
 - Automatic deployments on push to `main`
 
 ## Development

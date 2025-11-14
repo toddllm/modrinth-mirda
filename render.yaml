@@ -1,0 +1,31 @@
+services:
+  - type: pserv
+    name: mirda-minecraft-server
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: MEMORY
+        value: 4G
+      - key: MINECRAFT_VERSION
+        value: 1.20.1
+      - key: NEOFORGE_VERSION
+        value: 47.1.106
+      - key: SERVER_PORT
+        value: 25565
+      - key: ONLINE_MODE
+        value: true
+      - key: MOTD
+        value: Mirda Boss Mod Server - Prepare for Battle!
+      - key: DIFFICULTY
+        value: hard
+      - key: MAX_PLAYERS
+        value: 20
+      - key: VIEW_DISTANCE
+        value: 10
+      - key: ENABLE_COMMAND_BLOCK
+        value: true
+    disk:
+      name: minecraft-data
+      mountPath: /minecraft
+      sizeGB: 10
+    plan: standard

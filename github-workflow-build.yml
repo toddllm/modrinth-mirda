@@ -65,7 +65,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy-to-railway:
+  deploy-to-render:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
@@ -80,10 +80,8 @@ jobs:
         name: mirda-mod-jar
         path: build/libs/
 
-    - name: Install Railway CLI
-      run: npm install -g @railway/cli
-
-    - name: Deploy to Railway
-      run: railway up
+    - name: Deploy to Render
+      run: |
+        curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
       env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}

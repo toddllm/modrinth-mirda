@@ -1,6 +1,6 @@
 # CI/CD Setup Instructions
 
-This document explains how to manually set up GitHub Actions workflow for automated builds and deployments.
+This document explains how to manually set up GitHub Actions workflow for automated builds and deployments to Render.
 
 ## Why Manual Setup?
 
@@ -15,21 +15,26 @@ Due to GitHub App permissions, the workflow file cannot be added automatically. 
 3. **Copy the contents** from `github-workflow-build.yml` in this repository
 4. **Commit the file** to your repository
 
-### 2. Add Railway Token (Optional - for auto-deployment)
+### 2. Add Render Deploy Hook (Optional - for auto-deployment)
 
-If you want automatic Railway deployments:
+If you want automatic Render deployments:
 
-1. **Get Railway Token**:
-   - Go to [railway.app/account/tokens](https://railway.app/account/tokens)
-   - Create a new token
-   - Copy the token value
+1. **Create Render Service First**:
+   - Go to [dashboard.render.com](https://dashboard.render.com)
+   - Create your Minecraft server service (see DEPLOYMENT.md)
+   - Wait for initial deployment
 
-2. **Add to GitHub Secrets**:
+2. **Get Deploy Hook URL**:
+   - Go to your service in Render Dashboard
+   - Settings → Deploy Hook
+   - Copy the URL (e.g., `https://api.render.com/deploy/srv-xxx?key=yyy`)
+
+3. **Add to GitHub Secrets**:
    - Go to your repository on GitHub
    - Settings → Secrets and variables → Actions
    - Click "New repository secret"
-   - Name: `RAILWAY_TOKEN`
-   - Value: (paste your Railway token)
+   - Name: `RENDER_DEPLOY_HOOK_URL`
+   - Value: (paste deploy hook URL)
    - Click "Add secret"
 
 ### 3. Verify Setup
@@ -61,7 +66,7 @@ Check the "Actions" tab on GitHub to see the workflow running.
 ✅ Creates a GitHub Release
 ✅ Attaches JAR files to the release
 ✅ Generates release notes automatically
-✅ Deploys to Railway (if RAILWAY_TOKEN is configured)
+✅ Deploys to Render (if RENDER_DEPLOY_HOOK_URL is configured)
 
 ### On Pull Request
 ✅ Builds the mod to verify it compiles
@@ -77,18 +82,18 @@ The workflow file should be created at:
 
 The contents are in `github-workflow-build.yml` in the root of this repository.
 
-## Railway Deployment
+## Render Deployment
 
-The workflow includes automatic Railway deployment when:
+The workflow includes automatic Render deployment when:
 - You push to `main` branch
 - You create a version tag
 
 **Requirements:**
-- Railway project set up
-- `RAILWAY_TOKEN` secret added to GitHub
+- Render service created and deployed once
+- `RENDER_DEPLOY_HOOK_URL` secret added to GitHub
 
-**To disable Railway deployment:**
-Remove or comment out the `deploy-to-railway` job in the workflow file.
+**To disable Render deployment:**
+Remove or comment out the `deploy-to-render` job in the workflow file.
 
 ## Troubleshooting
 
@@ -102,10 +107,11 @@ Remove or comment out the `deploy-to-railway` job in the workflow file.
 - Verify Gradle build works locally: `./gradlew build`
 - Review workflow logs in Actions tab
 
-### Railway deployment fails
-- Verify `RAILWAY_TOKEN` is set correctly
-- Check Railway project exists
-- Review Railway logs
+### Render deployment fails
+- Verify `RENDER_DEPLOY_HOOK_URL` is set correctly
+- Check Render service exists and is running
+- Review Render deployment logs
+- Ensure deploy hook URL is complete (includes `?key=xxx`)
 
 ## Alternative: Skip GitHub Actions
 
@@ -113,12 +119,12 @@ If you prefer not to use GitHub Actions:
 
 1. **Manual Builds**: Run `./gradlew build` locally
 2. **Manual Releases**: Create releases on GitHub manually
-3. **Manual Railway Deploy**: Use Railway CLI or dashboard
+3. **Manual Render Deploy**: Use Render dashboard or deploy hook
 
 See `DEPLOYMENT.md` for manual deployment instructions.
 
 ## Questions?
 
 - **GitHub Actions**: [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- **Railway**: See `DEPLOYMENT.md` in this repository
+- **Render**: See `DEPLOYMENT.md` in this repository
 - **Issues**: Open an issue on this GitHub repository
