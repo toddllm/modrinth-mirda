@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+.github
+
+# Gradle
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+
+# Build
+build/
+out/
+bin/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# Documentation
+*.md
+!DEPLOYMENT.md
+docs/
+
+# Images
+*.png
+*.jpg
+*.jpeg
+!src/main/resources/**/*.png
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+*.tmp
+*.bak
+*.swp
+*~
+
+# Other
+node_modules/
+npm-debug.log

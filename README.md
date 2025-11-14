@@ -48,21 +48,50 @@ A NeoForge mod for Minecraft 1.20.1 that adds Mirda, the ultimate goddess-like b
 
 ## Building
 
+### Local Build
 ```bash
 ./gradlew build
 ```
 
+The compiled JAR will be in `build/libs/`
+
+### CI/CD
+The project includes automated GitHub Actions that:
+- ✅ Build the mod on every push
+- ✅ Run tests and cache dependencies
+- ✅ Create GitHub releases on version tags
+- ✅ Deploy to Railway automatically
+
+#### Creating a Release
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+GitHub Actions will automatically build and create a release with the JAR file.
+
 ## Running
 
-### Client
+### Local Client
 ```bash
 ./gradlew runClient
 ```
 
-### Server
+### Local Server
 ```bash
 ./gradlew runServer
 ```
+
+### Production Server (Railway)
+Deploy a public Minecraft server with the Mirda mod to Railway:
+
+1. **Quick Deploy**: [![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template)
+
+2. **Manual Setup**: See [DEPLOYMENT.md](DEPLOYMENT.md) for complete guide
+
+**Requirements:**
+- Railway account (free tier available)
+- 4GB+ RAM recommended
+- Automatic deployments on push to `main`
 
 ## Development
 
