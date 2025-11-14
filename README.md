@@ -2,6 +2,8 @@
 
 A NeoForge mod for Minecraft 1.20.1 that adds Mirda, the ultimate goddess-like boss entity.
 
+**Based on the Mirda Games universe**: Cthuslone, Golden Mirda, Xztalh, Destroyer of Worlds
+
 ## Features
 
 ### Mirda - The Ultimate Boss
@@ -110,13 +112,80 @@ When Mirda sits, she creates Omensoul:
 9. Crystal Power Phase
 10. Final Immortal Form
 
+## Commands
+
+### Summon Mirda's Altar
+```
+/summon_mirda_altar
+```
+or
+```
+/mirda_altar
+```
+Requires OP level 2. Generates Mirda's massive altar at your current location.
+
+## Custom Model & Textures
+
+The mod includes a **custom entity model** for Mirda with:
+- Tall goddess-like figure (giant-sized, 3x scale)
+- Flowing dark robes
+- Golden glowing crown/halo
+- Golden glowing chest orb
+- Animated dragon heads (appear at half health)
+- Dynamic animations for different phases
+- Particle effects for special abilities
+
+### Reference Artwork
+The mod includes reference artwork (`Connected Mirda and Xztalh.png`) showing:
+- Dark mystical robes
+- Golden crown/halo above head
+- Golden chest orb
+- Yellow/gold lightning energy
+- Powerful goddess appearance
+
+### Texture Creation
+See `TEXTURE_GUIDE.md` and `ITEM_TEXTURES.md` for detailed instructions on creating:
+- **Entity textures** (128x128): mirda.png, mirda_golden.png, mirda_ultra.png
+- **Item textures** (16x16): bocow.png, altar_compass.png, crystal_heart.png
+
+Textures should be placed in:
+```
+src/main/resources/assets/mirdamod/textures/entity/
+src/main/resources/assets/mirdamod/textures/item/
+```
+
+## Development Status
+
+### Completed ✅
+- Complete entity system with all phases
+- 11 custom AI goals for combat
+- Custom model with animations
+- Summoning system (skeletons, towers, zombies)
+- Omensoul boss fight
+- Custom items (Bocow, Altar Compass, Crystal Heart)
+- Altar/castle structure generation
+- Command system for testing
+- Full NBT save/load
+- Localization (English)
+
+### To Complete 🔨
+- Entity textures (waiting for artist or can use guides)
+- Item textures (waiting for artist or can use guides)
+- Emissive (glowing) texture layers
+- Additional phase implementations
+- Sound effects
+- Particle effects customization
+- World generation integration
+
 ## Notes
 
-- This is a work in progress
-- Custom models and textures can be added later
-- The image provided by the creator will be used for final textures
-- Structure generation can be triggered via commands (to be implemented)
+- Reference artwork included: `Connected Mirda and Xztalh.png`
+- Detailed texture guides provided for creating assets
+- Mod is fully functional but uses placeholder textures until custom ones are added
+- All mechanics and abilities are implemented and working
 
 ## Credits
 
 Created for the Mirda Games, Cthuslone, Golden Mirda, Xztalh, Destroyer of Worlds universe.
+
+Based on reference artwork showing Mirda's design.

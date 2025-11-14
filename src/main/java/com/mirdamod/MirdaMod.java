@@ -1,13 +1,16 @@
 package com.mirdamod;
 
+import com.mirdamod.command.ModCommands;
 import com.mirdamod.entity.ModEntities;
 import com.mirdamod.entity.client.ModEntityRenderers;
 import com.mirdamod.item.ModItems;
 import com.mirdamod.structure.ModStructures;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,5 +39,13 @@ public class MirdaMod {
 
     private void clientSetup(final FMLClientSetupEvent event) {
         event.enqueueWork(ModEntityRenderers::register);
+    }
+
+    @Mod.EventBusSubscriber(modid = MODID)
+    public static class ServerEvents {
+        @SubscribeEvent
+        public static void onRegisterCommands(RegisterCommandsEvent event) {
+            ModCommands.register(event.getDispatcher());
+        }
     }
 }

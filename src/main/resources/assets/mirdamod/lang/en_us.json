@@ -1,0 +1,34 @@
+{
+  "entity.mirdamod.mirda": "Mirda, Goddess of Destruction",
+  "entity.mirdamod.omensoul": "Omensoul",
+  "entity.mirdamod.advanced_skeleton": "Advanced Bone Warrior",
+  "entity.mirdamod.healing_tower": "Healing Tower",
+
+  "item.mirdamod.bocow": "Bocow",
+  "item.mirdamod.altar_compass": "Altar Compass",
+  "item.mirdamod.crystal_heart": "Crystal Heart",
+
+  "item.mirdamod.bocow.tooltip": "Mirda's legendary weapon - Press right-click for Eruption ability",
+  "item.mirdamod.altar_compass.tooltip": "Points you to Mirda's altar",
+
+  "mirda.speech.spawn": "You dare challenge me in my domain?",
+  "mirda.speech.half_health": "You think you can defeat me? I'm just getting started!",
+  "mirda.speech.golden_form": "Witness my Golden Form!",
+  "mirda.speech.ultra_form": "Enough games! Witness my Ultra Form!",
+  "mirda.speech.consume": "Your power is now mine!",
+  "mirda.speech.blackhole": "Witness the void! All shall be consumed!",
+  "mirda.speech.sit": "I shall rest and recover...",
+  "mirda.speech.night": "The night empowers me... Nah neh neh!",
+  "mirda.speech.day": "Daylight reveals my divine form!",
+  "mirda.speech.sunlight": "Exposed to sunlight!",
+  "mirda.speech.armor": "My armor has fallen!",
+  "mirda.speech.iron_armor": "You cannot touch me now!",
+  "mirda.speech.checkmated": "I am checkmated... but I will not fall easily!",
+  "mirda.speech.towers": "My towers shall sustain me!",
+  "mirda.speech.skeletons": "Rise, my skeletal warriors!",
+  "mirda.speech.zombies": "My armored soldiers shall protect me!",
+  "mirda.speech.grab": "You cannot escape my grasp!",
+  "mirda.speech.bocow": "The Bocow's power is unleashed!",
+  "mirda.speech.energy": "Feel my power!",
+  "mirda.speech.void": "The void hungers for more..."
+}
