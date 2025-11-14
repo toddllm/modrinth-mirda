@@ -2,7 +2,7 @@ FROM openjdk:17-slim
 
 # Install necessary packages
 RUN apt-get update && \
-    apt-get install -y wget curl && \
+    apt-get install -y wget curl procps && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -41,6 +41,10 @@ RUN echo "server-port=${SERVER_PORT}" > server.properties && \
 # Copy the built mod JAR from the build artifacts
 COPY build/libs/*.jar /minecraft/mods/
 
+# Copy watchdog script
+COPY watchdog.sh /minecraft/watchdog.sh
+RUN chmod +x /minecraft/watchdog.sh
+
 # Create mods directory if it doesn't exist
 RUN mkdir -p /minecraft/mods
 
@@ -51,8 +55,9 @@ EXPOSE ${SERVER_PORT}
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
     CMD pgrep -f "java.*server.jar" || exit 1
 
-# Start the server
-CMD java -Xmx${MEMORY} -Xms2G \
+# Start the server and watchdog
+CMD /minecraft/watchdog.sh & \
+    java -Xmx${MEMORY} -Xms2G \
     -XX:+UseG1GC \
     -XX:+ParallelRefProcEnabled \
     -XX:MaxGCPauseMillis=200 \

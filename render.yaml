@@ -24,8 +24,13 @@ services:
         value: 10
       - key: ENABLE_COMMAND_BLOCK
         value: true
+      - key: IDLE_MINUTES
+        value: 30
+      - key: CHECK_INTERVAL
+        value: 60
     disk:
       name: minecraft-data
       mountPath: /minecraft
       sizeGB: 10
     plan: standard
+    autoDeploy: false
