@@ -88,10 +88,14 @@ Deploy a public Minecraft server with the Mirda mod to Render:
 
 2. **Manual Setup**: See [DEPLOYMENT.md](DEPLOYMENT.md) for complete guide
 
+3. **Connect to Server**: See [CONNECTING.md](CONNECTING.md) for how players join
+
 **Requirements:**
 - Render account (free tier: 750hrs/month)
-- Standard plan ($25/month for 4GB RAM)
+- Standard plan ($25/month, or ~$3-5/month with auto-shutdown)
 - Automatic deployments on push to `main`
+
+**Note:** "Private Service" on Render is still publicly accessible via TCP for Minecraft!
 
 ## Development
 

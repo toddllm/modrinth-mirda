@@ -152,21 +152,37 @@ Render pricing (as of 2024):
 
 ### After Deployment
 
+Render will provide a **public hostname** for your server!
+
 1. **Get Server Address**
    - Render Dashboard → Your service
-   - Look for "Private Address" or external connection info
-   - Format: `your-service.onrender.com:25565`
+   - Look for external hostname (e.g., `mirda-minecraft-server-xxxx.onrender.com`)
+   - Port: 25565 (default Minecraft port)
+   - Full address: `your-hostname.onrender.com:25565`
 
 2. **Connect in Minecraft**
    - Open Minecraft 1.20.1 with NeoForge 47.1.106
    - Multiplayer → Add Server
-   - Server Address: `your-service.onrender.com:25565`
+   - Server Address: `your-hostname.onrender.com:25565`
    - Save and connect!
 
 3. **Test Mirda**
    ```
    /summon_mirda_altar
    ```
+
+**See [CONNECTING.md](CONNECTING.md) for detailed connection guide and troubleshooting.**
+
+### Understanding "Private Service"
+
+Don't worry - "Private Service" on Render **does NOT mean inaccessible**!
+
+- ✅ Still publicly accessible via TCP
+- ✅ Players can connect from anywhere on the internet
+- ❌ Just means it's not HTTP/web-based
+- ✅ Perfect for Minecraft servers
+
+The term "private" means it's not a web service, but it's fully accessible for game connections!
 
 ## Managing Your Server
 
