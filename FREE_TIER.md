@@ -178,6 +178,52 @@ sudo systemctl start minecraft
 | **Aternos** | $0 | Variable | No | Easy | Backup/casual |
 | **Railway** | $1-5 | 8GB | Yes | Medium | Paid convenience |
 | **Render** | N/A | N/A | N/A | N/A | **NOT usable** |
+| **Koyeb** | $0 | 512MB | Yes | Easy | **Auxiliary only** |
+
+---
+
+## Koyeb Free Tier - For Auxiliary Services
+
+**Koyeb's free tier is NOT suitable for Minecraft servers.**
+
+**Resources:**
+- 512 MB RAM
+- 0.1 vCPU
+- Auto-scaling to zero
+- Git-based deployments
+
+**Why Not for Minecraft:**
+- 512MB RAM is insufficient (Mirda needs 4GB minimum)
+- 0.1 vCPU cannot handle game tick processing
+- Server would crash on startup or during gameplay
+
+**What Koyeb IS Good For:**
+- **Status dashboards** - Lightweight web app showing server status
+- **API proxies** - Query server status via REST API
+- **Discord/Telegram bots** - Report server status to chat platforms
+- **Health monitors** - Track uptime across multiple servers
+- **Web landing pages** - Static sites about your server
+
+**Deployment:**
+This repository includes a GitHub Actions workflow for Koyeb deployment:
+- See [KOYEB_DEPLOYMENT.md](KOYEB_DEPLOYMENT.md) for setup instructions
+- Workflow: `.github/workflows/deploy_koyeb.yml`
+- Triggers on push to main branch
+- Requires `KOYEB_API_TOKEN` secret
+
+**Example Use Case - Status Bot:**
+```python
+# status_bot.py - Deploy to Koyeb for monitoring
+from mcstatus import JavaServer
+import discord
+
+async def check_server():
+    server = JavaServer.lookup("your-minecraft-server.com")
+    status = server.status()
+    return f"Players: {status.players.online}/{status.players.max}"
+```
+
+**Summary:** Use Koyeb for lightweight companion services that enhance your Minecraft server experience, not for hosting the game server itself.
 
 ---
 

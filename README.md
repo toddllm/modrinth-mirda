@@ -103,8 +103,11 @@ Host a public Minecraft server with the Mirda mod for **$0/month** using our mul
 - [DEPLOYMENT.md](DEPLOYMENT.md) - Detailed setup for each provider
 - [CONNECTING.md](CONNECTING.md) - How players connect
 - [FREE_TIER.md](FREE_TIER.md) - Cost optimization tips
+- [KOYEB_DEPLOYMENT.md](KOYEB_DEPLOYMENT.md) - CI/CD for auxiliary services
 
 **Important:** Render Private Services are NOT publicly accessible and cannot be used for public game servers. See [MULTI_PROVIDER.md](MULTI_PROVIDER.md) for details.
+
+**Note:** Koyeb (512MB RAM) is suitable for auxiliary services (status dashboards, bots) but NOT for the Minecraft server itself.
 
 ## Development
 
