@@ -60,7 +60,7 @@ The project includes automated GitHub Actions that:
 - ✅ Build the mod on every push
 - ✅ Run tests and cache dependencies
 - ✅ Create GitHub releases on version tags
-- ✅ Deploy to Railway automatically
+- ✅ Optional deployment to Railway (paid after trial)
 
 #### Creating a Release
 ```bash
@@ -81,21 +81,30 @@ GitHub Actions will automatically build and create a release with the JAR file.
 ./gradlew runServer
 ```
 
-### Production Server (Render)
-Deploy a public Minecraft server with the Mirda mod to Render:
+### Production Server (Free Hosting)
 
-1. **Quick Deploy**: Use Render Blueprint from `render.yaml`
+Host a public Minecraft server with the Mirda mod for **$0/month** using our multi-provider strategy:
 
-2. **Manual Setup**: See [DEPLOYMENT.md](DEPLOYMENT.md) for complete guide
+**Recommended Options:**
+- **FalixNodes** (Primary) - 4GB RAM, free forever, easy mod support
+- **Oracle Cloud Always Free** - 24GB RAM, 24/7 uptime, requires setup
+- **Aternos** (Backup) - Free with queue system, 4GB world limit
 
-3. **Connect to Server**: See [CONNECTING.md](CONNECTING.md) for how players join
+**Quick Start:**
+1. Create account at [FalixNodes](https://falixnodes.net) or [Oracle Cloud](https://cloud.oracle.com)
+2. Set up NeoForge 1.20.1 server
+3. Upload Mirda mod JAR
+4. Configure Cloudflare DNS (optional, for custom domain)
+5. Share server address with players
 
-**Requirements:**
-- Render account (free tier: 750hrs/month)
-- Standard plan ($25/month, or ~$3-5/month with auto-shutdown)
-- Automatic deployments on push to `main`
+**Full Guide:** See [MULTI_PROVIDER.md](MULTI_PROVIDER.md) for complete multi-provider strategy
 
-**Note:** "Private Service" on Render is still publicly accessible via TCP for Minecraft!
+**Deployment Docs:**
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Detailed setup for each provider
+- [CONNECTING.md](CONNECTING.md) - How players connect
+- [FREE_TIER.md](FREE_TIER.md) - Cost optimization tips
+
+**Important:** Render Private Services are NOT publicly accessible and cannot be used for public game servers. See [MULTI_PROVIDER.md](MULTI_PROVIDER.md) for details.
 
 ## Development
 

@@ -1,316 +1,386 @@
 # How to Connect to Your Mirda Minecraft Server
 
-This guide explains how players connect to the Minecraft server hosted on Render.
+This guide explains how players connect to your Minecraft server running the Mirda Boss Mod.
 
-## Understanding "Private Service"
+## Important: Hosting Provider Matters
 
-**Important:** "Private Service" on Render does NOT mean "inaccessible"!
+**WARNING: Render Private Services are NOT publicly accessible from the internet.**
 
-- ✅ **Still publicly accessible** via TCP
-- ✅ Players can connect from anywhere
-- ❌ Just means it's not HTTP/web-based
-- ✅ Perfect for Minecraft (uses port 25565)
+If you deployed to Render as a "Private Service", players **CANNOT** connect directly. Render Private Services:
+- Have no public IP address
+- Are only accessible within Render's internal network
+- Require VPN/tunnel setup for external access (advanced)
 
-## Getting Your Server Address
+**For public multiplayer, use one of these providers instead:**
+- FalixNodes (free, easy)
+- Oracle Cloud Always Free (free, powerful)
+- Aternos (free, with queue)
+- Railway (paid after trial)
+- Any VPS with public IP
 
-### Step 1: Find Your Server's Hostname
+See [MULTI_PROVIDER.md](MULTI_PROVIDER.md) for setup instructions.
 
-After deploying to Render:
+---
 
-1. **Go to Render Dashboard**
-   - [dashboard.render.com](https://dashboard.render.com)
-   - Select your `mirda-minecraft-server` service
+## Connecting to FalixNodes Server
 
-2. **Look for Connection Info**
-   - You'll see something like:
-     ```
-     External Address: mirda-minecraft-server-xxxx.onrender.com
-     Port: 25565
-     ```
+### Getting Your Server Address
 
-3. **Copy the full address:**
+1. **Log in to FalixNodes Panel**
+   - [falixnodes.net/panel](https://falixnodes.net/panel)
+
+2. **Find Connection Info**
+   - Select your server
+   - Look for "Server Address" section
+   - Copy the address (format: `node.falixsrv.me:12345`)
+
+3. **Share with Players**
    ```
-   mirda-minecraft-server-xxxx.onrender.com:25565
+   node.falixsrv.me:12345
    ```
 
-### Step 2: Share with Players
+### Player Connection Steps
 
-Give players the address:
-```
-mirda-minecraft-server-xxxx.onrender.com:25565
-```
+1. **Install Prerequisites:**
+   - Minecraft Java Edition 1.20.1
+   - NeoForge 47.1.106
+   - Mirda Boss Mod JAR (place in `.minecraft/mods/`)
 
-Or just the hostname (25565 is default):
-```
-mirda-minecraft-server-xxxx.onrender.com
-```
+2. **Launch Minecraft:**
+   - Use NeoForge profile
+   - Select version 1.20.1
 
-## Connecting in Minecraft
-
-### For Players:
-
-1. **Launch Minecraft 1.20.1** with **NeoForge 47.1.106** installed
-
-2. **Go to Multiplayer**
+3. **Add Server:**
    - Click "Multiplayer"
    - Click "Add Server"
+   - Server Name: `Mirda Boss Server`
+   - Server Address: `node.falixsrv.me:12345`
+   - Click "Done"
 
-3. **Enter Server Info:**
-   - **Server Name:** Mirda Boss Server (or whatever you want)
-   - **Server Address:** `your-service.onrender.com:25565`
+4. **Connect and Play!**
+   - Click "Join Server"
+   - Ask admin to run `/summon_mirda_altar`
 
-4. **Click "Done"** then **"Join Server"**
+---
 
-5. **Fight Mirda!**
-   - Ask admin to run: `/summon_mirda_altar`
+## Connecting to Oracle Cloud Server
+
+### Getting Your Server Address
+
+1. **Find VM Public IP**
+   - Oracle Cloud Console → Compute → Instances
+   - Note the Public IP Address (e.g., `140.238.xxx.xxx`)
+
+2. **Server Address:**
+   ```
+   140.238.xxx.xxx:25565
+   ```
+
+3. **Or use custom domain** (if configured via Cloudflare):
+   ```
+   play.yourdomain.com
+   ```
+
+### Player Connection Steps
+
+Same as FalixNodes, but use Oracle Cloud IP or your custom domain.
+
+---
+
+## Connecting to Aternos Server
+
+### Getting Your Server Address
+
+1. **Log in to Aternos**
+   - [aternos.org](https://aternos.org)
+
+2. **Start Server** (wait in queue)
+
+3. **Find Address:**
+   - Format: `YourServer.aternos.me`
+
+### Player Connection Steps
+
+1. **Server must be running** (owner starts it first)
+2. **Add server in Minecraft:**
+   - Server Address: `YourServer.aternos.me`
+3. **Note:** Server auto-shuts down after inactivity
+
+---
+
+## Using Custom Domain (Cloudflare)
+
+If you configured Cloudflare DNS:
+
+### Players Connect To:
+```
+play.yourdomain.com
+```
+
+### No Port Needed
+Cloudflare SRV records handle port routing automatically.
+
+### Switching Providers
+When you change providers:
+1. Update DNS A record to new IP
+2. Players still connect to same domain
+3. Seamless transition
+
+See [MULTI_PROVIDER.md](MULTI_PROVIDER.md) for DNS setup.
+
+---
 
 ## Troubleshooting
 
 ### "Can't Connect to Server"
 
-**Check if server is running:**
-1. Dashboard → Your service → Status should be "Live"
-2. Logs should show: "Done! For help, type 'help'"
-
-**Wait for startup:**
-- Server takes 2-5 minutes to start
-- Check logs for "Server started"
+**Check server is running:**
+- FalixNodes: Panel shows "Online"
+- Oracle Cloud: SSH in and check process
+- Aternos: Must be started, not in queue
 
 **Verify address:**
-- Make sure you're using the exact hostname from Render
-- Include port :25565
+- Double-check IP/hostname spelling
+- Include port if not 25565
+- Don't add `https://` prefix
+
+**Wait for startup:**
+- Server takes 1-3 minutes to fully start
+- Check logs for "Done! For help, type 'help'"
+
+### "Connection Refused"
+
+**Firewall issues:**
+- Oracle Cloud: Check security list allows TCP 25565
+- VPS: Check iptables/ufw rules
+- FalixNodes: Firewall handled automatically
+
+**Wrong port:**
+- FalixNodes uses non-standard ports (e.g., 12345)
+- Oracle Cloud/VPS use 25565 by default
+- Verify in hosting panel
+
+### "Outdated Client/Server"
+
+**Version mismatch:**
+- Server: Minecraft 1.20.1, NeoForge 47.1.106
+- Players must have exact same versions
+- Download mod JAR from GitHub releases
+- Place in `.minecraft/mods/` folder
 
 ### "Unknown Host"
 
-- Double-check the hostname spelling
-- Remove `https://` if you accidentally added it
-- Just use: `hostname.onrender.com:25565`
+**DNS issues:**
+- Check hostname spelling
+- For Cloudflare: Wait 5-10 minutes for propagation
+- Use direct IP as fallback
 
-### "Server Offline"
+### "Server Offline" (Aternos)
 
-The watchdog may have shut it down due to inactivity!
+**Auto-shutdown occurred:**
+- Aternos shuts down after inactivity
+- Owner must restart via dashboard
+- Wait in queue before connecting
 
-**To restart:**
-1. Render Dashboard → Your service
-2. "Manual Deploy" → "Deploy latest commit"
-3. Wait 2-5 minutes for server to start
-
-### "Outdated Server/Client"
-
-- Server is 1.20.1 with NeoForge 47.1.106
-- Players must have exact same versions
-- Download Mirda mod JAR and place in mods folder
+---
 
 ## Server Administration
 
-### Making Yourself OP
+### Becoming OP (Operator)
 
-**Option 1: Environment Variable (before starting)**
-1. Render Dashboard → Environment
-2. Add: `OPS=YourMinecraftUsername`
-3. Redeploy service
+**FalixNodes:**
+1. Panel → Console
+2. Type: `op YourUsername`
+3. Press Enter
 
-**Option 2: Via Console**
-1. Render Dashboard → Shell
-2. Attach to Minecraft console:
-   ```bash
-   tail -f logs/latest.log
-   ```
-3. In another shell tab, run:
-   ```bash
-   echo "op YourUsername" > /minecraft/stdin
-   ```
+**Oracle Cloud:**
+1. SSH into VM
+2. Attach to screen/tmux session
+3. Type: `op YourUsername`
 
-### Essential Commands (once OP)
+**Aternos:**
+1. Server must be running
+2. Go to Console tab
+3. Type: `op YourUsername`
 
+### Essential Commands
+
+```bash
+/summon_mirda_altar           # Spawn Mirda's altar
+/give @s mirdamod:bocow       # Get Mirda's weapon
+/give @s mirdamod:altar_compass  # Get altar compass
+/give @s mirdamod:crystal_heart  # Get crystal heart
+/op PlayerName                # Make player OP
+/gamemode creative            # Change game mode
+/tp @s 0 100 0               # Teleport
 ```
-/summon_mirda_altar          # Spawn Mirda's altar
-/give @s mirdamod:bocow      # Get Mirda's weapon
-/give @s mirdamod:altar_compass  # Get compass to altar
-/op PlayerName               # Make another player OP
-/gamemode creative           # Creative mode
-/tp PlayerName 0 100 0       # Teleport player
+
+### Whitelist Setup
+
+```bash
+/whitelist on                 # Enable whitelist
+/whitelist add PlayerName     # Add player
+/whitelist list              # View allowed players
+/whitelist off               # Disable (allow all)
 ```
 
-## Checking Server Status
+---
 
-### Is the server running?
+## What About Render?
 
-**Method 1: Render Dashboard**
-- Status indicator shows "Live" (green) or "Offline" (red)
+**Render Private Services are NOT suitable for public Minecraft servers.**
 
-**Method 2: Minecraft Server List**
-- Add server to Minecraft
-- Look for green connection bars
-- Shows player count
+If you insist on using Render, you must:
 
-**Method 3: Online Tools**
-- [mcsrvstat.us](https://mcsrvstat.us)
-- Enter: `your-hostname.onrender.com`
-- Shows server status, version, players
+1. **Set up VPN/Tunnel:**
+   - Install Tailscale on Render service and all player machines
+   - Or configure WireGuard VPN
+   - Or use ngrok/Cloudflare Tunnel
 
-## Auto-Shutdown Behavior
+2. **Players connect via:**
+   - VPN IP address (not public internet)
+   - Only works if all players join VPN
 
-The server automatically shuts down after **30 minutes** of no players (to save costs).
+3. **This is NOT recommended:**
+   - Complex setup
+   - Additional software required
+   - Not worth the effort vs. free alternatives
 
-**When it happens:**
-- All players disconnect
-- Wait 30 minutes
-- Server shuts down
-- Render status: "Offline"
+**Better option:** Use FalixNodes or Oracle Cloud (free, public, easy).
 
-**To restart:**
-1. Render Dashboard → Manual Deploy
-2. Wait 2-5 minutes
-3. Reconnect in Minecraft
+---
 
-**To adjust timeout:**
-1. Render Dashboard → Environment
-2. Change `IDLE_MINUTES` (default: 30)
-3. Set to 0 to disable auto-shutdown
-
-## Performance Tips
-
-### For Best Experience:
-
-**Server Settings:**
-- View distance: 10 chunks (default)
-- Max players: 20 (configurable)
-- Render plan: Standard (4GB RAM minimum)
-
-**Player Requirements:**
-- Good internet connection
-- Minecraft 1.20.1
-- NeoForge 47.1.106 installed
-- Mirda mod JAR in mods folder
-
-**Reduce Lag:**
-- Lower `VIEW_DISTANCE` to 6-8 in render.yaml
-- Reduce `MAX_PLAYERS` if needed
-- Upgrade to Pro plan (8GB RAM)
-
-## Sharing Your Server
-
-### Server Information Template
+## Server Information Template
 
 Share this with your players:
 
 ```
 🎮 MIRDA BOSS SERVER 🎮
 
-Server Address: your-hostname.onrender.com:25565
+Server Address: [your-server-address]
 Minecraft Version: 1.20.1
 Mod Loader: NeoForge 47.1.106
-Required Mod: Mirda Boss Mod (download from GitHub releases)
+Required Mod: Mirda Boss Mod
 
-Installation:
-1. Install Minecraft 1.20.1
+Installation Steps:
+1. Install Minecraft Java Edition 1.20.1
 2. Install NeoForge 47.1.106
-3. Download Mirda mod JAR
-4. Place in .minecraft/mods folder
-5. Launch Minecraft with NeoForge profile
+3. Download Mirda mod JAR from GitHub releases
+4. Place JAR in .minecraft/mods folder
+5. Launch with NeoForge profile
 6. Add server and connect!
 
-Special Features:
-- Fight Mirda, the ultimate boss!
-- Multiple phases and abilities
-- Massive altar/castle to explore
-- Custom weapons and items
+Features:
+- Fight Mirda, the ultimate goddess boss!
+- 13 different phases with unique abilities
+- Massive altar/castle structure
+- Custom weapons (Bocow) and items
+- Blackhole attack, lightning, time manipulation
+- Omensoul spirit boss fight
 
-Commands:
-- /summon_mirda_altar - Spawn the altar (OP only)
+In-Game Commands (OP only):
+- /summon_mirda_altar - Spawn the boss arena
 
-Note: Server auto-shuts down after 30 min of inactivity.
-If offline, message admin to restart!
+Note: [Add any server-specific notes here]
 ```
 
-## Port Forwarding (Not Needed!)
+---
 
-**Good news:** Render handles all networking automatically!
+## Player Requirements
 
-- ❌ No port forwarding needed
-- ❌ No router configuration
-- ❌ No firewall rules
-- ✅ Just use the Render hostname
+### Minimum Requirements
 
-This is way easier than hosting at home!
+- **Minecraft:** Java Edition 1.20.1
+- **Mod Loader:** NeoForge 47.1.106
+- **Mod:** Mirda Boss Mod JAR
+- **RAM:** 4GB+ allocated to Minecraft
+- **Java:** 17 or higher
 
-## Whitelist (Optional)
+### Recommended Setup
 
-To restrict who can join:
+1. **Install Java 17** (if not already)
+2. **Install Minecraft 1.20.1**
+3. **Download NeoForge installer:**
+   - [neoforged.net](https://neoforged.net)
+   - Version 47.1.106 for 1.20.1
+4. **Run installer** (choose "Install client")
+5. **Download Mirda mod JAR** from GitHub releases
+6. **Place in mods folder:**
+   - Windows: `%appdata%\.minecraft\mods\`
+   - Mac: `~/Library/Application Support/minecraft/mods/`
+   - Linux: `~/.minecraft/mods/`
+7. **Launch Minecraft** with NeoForge profile
+8. **Connect to server**
 
-1. **Create whitelist file**
-   - Render Shell: `touch whitelist.json`
-   - Edit: `vi whitelist.json`
-   - Add:
-     ```json
-     [
-       {
-         "uuid": "player-uuid-here",
-         "name": "PlayerName"
-       }
-     ]
-     ```
+---
 
-2. **Enable whitelist**
-   - Add to render.yaml:
-     ```yaml
-     - key: WHITELIST
-       value: true
-     ```
-   - Or in server console: `/whitelist on`
+## Checking Server Status
 
-3. **Add players**
-   - `/whitelist add PlayerName`
+### Method 1: Direct Connection Test
 
-## IP Address vs Hostname
+In Minecraft:
+1. Add server to server list
+2. Look for green signal bars
+3. Shows "Online" with player count
 
-**Use hostname (recommended):**
+### Method 2: Online Status Checker
+
+Use [mcsrvstat.us](https://mcsrvstat.us):
+1. Enter server address
+2. See status, version, MOTD, players
+3. Note: Doesn't work for Render Private Services
+
+### Method 3: Hosting Panel
+
+- FalixNodes: Panel shows server status
+- Oracle Cloud: Check if process running via SSH
+- Aternos: Dashboard shows running/offline
+
+---
+
+## Performance Optimization
+
+### Server Settings (Admin)
+
+Edit `server.properties`:
+```properties
+view-distance=10        # Lower for less lag (6-8)
+max-players=20          # Limit concurrent players
+network-compression-threshold=256  # Default is fine
 ```
-your-service.onrender.com:25565
-```
 
-**IP address (may change):**
-```
-123.45.67.89:25565
-```
+### Client Settings (Players)
 
-⚠️ **Warning:** Render may change IP addresses on redeployment. Always use the hostname for reliability!
+- Lower render distance if lagging
+- Allocate more RAM to Minecraft (4GB+)
+- Use OptiFine or Sodium for better FPS
+- Reduce graphics settings in intense fights
 
-## Mobile Players
+### Network Tips
 
-Minecraft Bedrock Edition (mobile, console) **cannot** connect to Java Edition servers.
+- Wired connection > WiFi
+- Close bandwidth-heavy applications
+- Ping matters less than you think for MC
 
-This server is:
-- ✅ Java Edition compatible
-- ❌ Bedrock Edition incompatible
+---
 
-Players need:
-- PC (Windows, Mac, Linux)
-- Java Edition of Minecraft
-- NeoForge mod loader
+## Mobile/Console Players
 
-## Cost During Play Sessions
+**Minecraft Bedrock Edition CANNOT connect to Java Edition servers.**
 
-**Server running costs:**
-- Standard plan: $25/month = ~$0.034/hour
-- 4 hour play session: ~$0.14
-- 100 hours/month total: ~$3.40/month
+This mod requires:
+- ✅ Java Edition (PC, Mac, Linux)
+- ❌ Bedrock Edition (mobile, console, Windows 10 Store version)
 
-**Tip:** Manually start/stop server to minimize costs!
+Bedrock players need:
+- A PC with Minecraft Java Edition
+- Or a separate Bedrock server (mod won't work)
 
-## Questions?
+---
 
-**Server Issues:**
-- Check Render Dashboard logs
-- GitHub Issues for mod bugs
+## Further Reading
 
-**Minecraft Help:**
-- [Minecraft Wiki](https://minecraft.fandom.com)
-- [NeoForge Discord](https://discord.neoforged.net)
-
-**Connection Problems:**
-- Verify Minecraft version (1.20.1)
-- Check NeoForge version (47.1.106)
-- Ensure Mirda mod is installed
-- Wait for server startup (2-5 min)
+- [MULTI_PROVIDER.md](MULTI_PROVIDER.md) - Hosting provider details
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Server setup guide
+- [FREE_TIER.md](FREE_TIER.md) - Cost optimization
+- [README.md](README.md) - Mod features and commands

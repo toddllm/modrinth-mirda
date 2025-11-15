@@ -1,0 +1,28 @@
+# Railway Deployment Configuration
+# This file configures how the Minecraft server with Mirda mod is deployed to Railway
+
+version = 2
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "java -Xmx4G -Xms2G -jar server.jar nogui"
+healthcheckPath = "/"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[environments.production.variables]
+MEMORY = "4G"
+MINECRAFT_VERSION = "1.20.1"
+NEOFORGE_VERSION = "47.1.106"
+SERVER_PORT = "25565"
+ONLINE_MODE = "true"
+MOTD = "Mirda Boss Mod Server - Prepare for Battle!"
+DIFFICULTY = "hard"
+MAX_PLAYERS = "20"
+VIEW_DISTANCE = "10"
+ENABLE_COMMAND_BLOCK = "true"
+OPS = ""

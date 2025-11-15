@@ -1,428 +1,543 @@
-# Deployment to Render
+# Server Deployment Guide
 
-This document explains how to deploy a Minecraft server with the Mirda Boss Mod to Render.
-
-## Prerequisites
-
-1. **Render Account**: Sign up at [render.com](https://render.com)
-2. **GitHub Repository**: This repository should be connected to Render
-3. **Render Deploy Hook**: Get from Render dashboard (for CI/CD)
+This document explains how to deploy a Minecraft server with the Mirda Boss Mod.
 
 ## Quick Start
 
-### Option 1: Deploy via Render Dashboard (Recommended)
+**Recommended for most users:** Use FalixNodes or Oracle Cloud Always Free for **$0/month** hosting.
 
-1. **Create New Service**
-   - Go to [Render Dashboard](https://dashboard.render.com)
-   - Click "New +" → "Private Service"
-   - Connect your GitHub repository
-   - Render will auto-detect the `Dockerfile`
+**Important:** Render Private Services are NOT publicly accessible and CANNOT be used for public game servers. See the "Advanced: Render (Internal Only)" section at the end if you need internal-only hosting.
+
+---
+
+## Option 1: FalixNodes (Recommended - Easy Setup)
+
+**Cost:** $0/month forever
+**Difficulty:** Easy
+**Best for:** Users who want quick setup with mod support
+
+### Setup Steps
+
+1. **Create Account**
+   - Go to [falixnodes.net](https://falixnodes.net)
+   - Sign up for free account
+
+2. **Create Server**
+   - Dashboard → Create Server
+   - Select "Minecraft Java"
+   - Choose a server location close to your players
+
+3. **Configure Server**
+   - Server Type: NeoForge
+   - Minecraft Version: 1.20.1
+   - NeoForge Version: 47.1.106
+
+4. **Upload Mirda Mod**
+   - Go to File Manager or FTP
+   - Navigate to `/mods` folder
+   - Upload `mirdamod-1.0.0.jar`
+
+5. **Start Server**
+   - Click "Start"
+   - Wait for startup (~1-2 minutes)
+   - Note the Server Address (e.g., `node.falixsrv.me:12345`)
+
+6. **Share with Players**
+   ```
+   node.falixsrv.me:12345
+   ```
+
+### FalixNodes Features
+
+- 4GB RAM (sufficient for Mirda mod)
+- NeoForge pre-installed
+- Web-based file manager
+- FTP access for larger uploads
+- DDoS protection included
+- Free forever
+
+---
+
+## Option 2: Oracle Cloud Always Free (Best Performance)
+
+**Cost:** $0/month forever
+**Difficulty:** Advanced
+**Best for:** Users who want maximum performance and 24/7 uptime
+
+### Prerequisites
+
+- Oracle Cloud account (requires credit card, never charged)
+- Basic Linux command line knowledge
+- SSH client
+
+### Setup Steps
+
+1. **Create Oracle Cloud Account**
+   - Go to [cloud.oracle.com](https://cloud.oracle.com)
+   - Sign up (credit card required for verification only)
+   - Select "Always Free" tier
+
+2. **Create VM Instance**
+   - Compute → Instances → Create Instance
+   - Image: Oracle Linux or Ubuntu
+   - Shape: VM.Standard.A1.Flex (Ampere ARM)
+   - OCPU: 4, Memory: 24GB
+   - Configure SSH keys
+
+3. **Configure Security List**
+   - Networking → Virtual Cloud Networks
+   - Select your VCN → Security Lists
+   - Add Ingress Rule:
+     - Source CIDR: `0.0.0.0/0`
+     - Protocol: TCP
+     - Port: 25565
+
+4. **Connect via SSH**
+   ```bash
+   ssh opc@your-vm-ip
+   # or
+   ssh ubuntu@your-vm-ip
+   ```
+
+5. **Install Java 17**
+   ```bash
+   sudo apt update  # Ubuntu
+   sudo apt install openjdk-17-jdk-headless
+
+   # or for Oracle Linux:
+   sudo yum install java-17-openjdk-headless
+   ```
+
+6. **Install NeoForge Server**
+   ```bash
+   mkdir minecraft && cd minecraft
+
+   # Download NeoForge installer
+   wget https://maven.neoforged.net/releases/net/neoforged/neoforge/47.1.106/neoforge-47.1.106-installer.jar
+
+   # Run installer
+   java -jar neoforge-47.1.106-installer.jar --installServer
+
+   # Accept EULA
+   echo "eula=true" > eula.txt
+   ```
+
+7. **Upload Mirda Mod**
+   ```bash
+   mkdir mods
+   # From your local machine:
+   scp mirdamod-1.0.0.jar opc@your-vm-ip:~/minecraft/mods/
+   ```
+
+8. **Configure Firewall**
+   ```bash
+   sudo iptables -I INPUT -p tcp --dport 25565 -j ACCEPT
+   sudo netfilter-persistent save  # Ubuntu
+   # or
+   sudo firewall-cmd --permanent --add-port=25565/tcp  # Oracle Linux
+   sudo firewall-cmd --reload
+   ```
+
+9. **Start Server**
+   ```bash
+   java -Xmx4G -Xms2G -jar server.jar nogui
+   ```
+
+10. **Create Systemd Service** (for auto-restart)
+    ```bash
+    sudo nano /etc/systemd/system/minecraft.service
+    ```
+
+    ```ini
+    [Unit]
+    Description=Minecraft Mirda Server
+    After=network.target
+
+    [Service]
+    User=opc
+    WorkingDirectory=/home/opc/minecraft
+    ExecStart=/usr/bin/java -Xmx4G -Xms2G -jar server.jar nogui
+    Restart=on-failure
+    RestartSec=10
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+    ```bash
+    sudo systemctl daemon-reload
+    sudo systemctl enable minecraft
+    sudo systemctl start minecraft
+    ```
+
+11. **Share with Players**
+    ```
+    your-vm-public-ip:25565
+    ```
+
+### Oracle Cloud Features
+
+- 24GB RAM available
+- Full root access
+- 24/7 operation
+- No time limits
+- Best free performance
+
+---
+
+## Option 3: Aternos (Backup/Casual)
+
+**Cost:** $0/month
+**Difficulty:** Very Easy
+**Best for:** Backup server or casual play sessions
+
+### Setup Steps
+
+1. **Create Account**
+   - Go to [aternos.org](https://aternos.org)
+   - Sign up for free
+
+2. **Create Server**
+   - Create new server
+   - Select "Software" → NeoForge
+   - Version: 1.20.1
+
+3. **Upload Mirda Mod**
+   - Go to "Files" tab
+   - Navigate to `mods` folder
+   - Upload `mirdamod-1.0.0.jar`
+
+4. **Start Server**
+   - Click "Start" (wait in queue: 5-15 minutes)
+   - Once running, note address: `YourServer.aternos.me`
+
+5. **Share with Players**
+   ```
+   YourServer.aternos.me
+   ```
+
+### Aternos Limitations
+
+- Queue wait times (5-15 minutes)
+- Auto-shutdown after inactivity
+- 4GB world size limit
+- Best used as backup
+
+---
+
+## Option 4: Railway (Paid After Trial)
+
+**Cost:** $5 free trial credit, then $1-5/month
+**Difficulty:** Medium
+**Best for:** Users willing to pay for convenience
+
+### Prerequisites
+
+- GitHub account
+- Railway account connected to GitHub
+
+### Setup Steps
+
+1. **Connect Repository**
+   - Go to [railway.app](https://railway.app)
+   - New Project → Deploy from GitHub
+   - Select this repository
 
 2. **Configure Service**
-   - **Name**: `mirda-minecraft-server`
-   - **Region**: Choose closest to your players
-   - **Instance Type**: Standard (4GB RAM minimum)
-   - **Docker Command**: (leave default, uses Dockerfile CMD)
+   Railway auto-detects the `Dockerfile` and uses included configs:
+   - `railway.json` - Build configuration
+   - `railway.toml` - Deployment settings
 
-3. **Add Environment Variables**
-   In Render dashboard, add:
+3. **Set Environment Variables**
    ```
    MEMORY=4G
    MINECRAFT_VERSION=1.20.1
    NEOFORGE_VERSION=47.1.106
    SERVER_PORT=25565
    ONLINE_MODE=true
-   MOTD=Mirda Boss Mod Server - Prepare for Battle!
-   DIFFICULTY=hard
    MAX_PLAYERS=20
-   VIEW_DISTANCE=10
-   ENABLE_COMMAND_BLOCK=true
    ```
 
-4. **Add Persistent Disk**
-   - Name: `minecraft-data`
-   - Mount Path: `/minecraft`
-   - Size: 10GB minimum
+4. **Deploy**
+   - Railway builds and deploys automatically
+   - Provides public TCP endpoint
+   - Format: `your-app.up.railway.app:25565`
 
-5. **Deploy**
-   - Click "Create Private Service"
-   - Wait for build (~5-10 minutes)
-   - Render will provide a connection address
+5. **Share with Players**
+   ```
+   your-app.up.railway.app:25565
+   ```
 
-### Option 2: Deploy via render.yaml (Infrastructure as Code)
+### Railway Features
 
-This repository includes `render.yaml` for automatic setup:
+- Easy GitHub integration
+- Automatic deployments
+- Public TCP support (unlike Render!)
+- Good performance
+- Pay-per-use after trial
 
-1. **Push to GitHub**
+---
+
+## Using Cloudflare DNS (Optional)
+
+Configure a custom domain for your server:
+
+1. **Register Domain** ($10-15/year)
+2. **Add to Cloudflare** (free)
+3. **Create DNS Records:**
+
+   **A Record:**
+   ```
+   Type: A
+   Name: play
+   IPv4: <your-server-ip>
+   Proxy: OFF (required for game traffic)
+   ```
+
+   **SRV Record:**
+   ```
+   Type: SRV
+   Name: _minecraft._tcp.play
+   Service: _minecraft
+   Protocol: TCP
+   Port: 25565
+   Target: play.yourdomain.com
+   ```
+
+4. **Players Connect To:**
+   ```
+   play.yourdomain.com
+   ```
+
+Benefits:
+- Professional domain name
+- Easy provider switching (just update IP)
+- Automatic port routing via SRV
+
+See [MULTI_PROVIDER.md](MULTI_PROVIDER.md) for complete DNS setup.
+
+---
+
+## CI/CD Pipeline (GitHub Actions)
+
+The repository includes automated build and deployment:
+
+### Configuration Files
+
+- `github-workflow-build.yml` - GitHub Actions workflow template
+- `railway.json` - Railway build config
+- `railway.toml` - Railway environment settings
+
+### Setup GitHub Actions
+
+1. **Copy Workflow File**
    ```bash
-   git push origin main
+   mkdir -p .github/workflows
+   cp github-workflow-build.yml .github/workflows/build.yml
    ```
 
-2. **Connect to Render**
-   - Dashboard → "New +" → "Blueprint"
-   - Connect repository
-   - Render reads `render.yaml` and creates everything
-
-3. **Automatic Setup**
-   - Creates Private Service
-   - Configures environment variables
-   - Adds persistent disk
-   - Deploys automatically
-
-### Option 3: Automatic Deployment via GitHub Actions
-
-1. **Get Render Deploy Hook**
-   - Go to your service in Render Dashboard
-   - Settings → Deploy Hook
-   - Copy the URL (e.g., `https://api.render.com/deploy/srv-xxx?key=yyy`)
-
-2. **Add to GitHub Secrets**
+2. **Add Secrets** (if using Railway)
    - Repository → Settings → Secrets → Actions
-   - New secret: `RENDER_DEPLOY_HOOK_URL`
-   - Value: (paste deploy hook URL)
+   - Add `RAILWAY_TOKEN` from Railway dashboard
 
-3. **Automatic Deployment**
-   - Push to `main` → triggers deployment
-   - Create tag → creates release AND deploys
+3. **Automatic Builds**
+   - Push to main → builds mod
+   - Tag with version → creates GitHub release
+   - Optional Railway deployment
 
-## Render vs Railway
+### Creating Releases
 
-**Why Render?**
-- ✅ More predictable pricing
-- ✅ Better free tier (750 hours/month)
-- ✅ Infrastructure as Code (render.yaml)
-- ✅ Persistent disk included
-- ✅ Better for long-running services
-
-## CI/CD Pipeline
-
-The GitHub Actions workflow (in `github-workflow-build.yml`) automatically:
-
-### On Every Push
-- ✅ Builds the mod
-- ✅ Uploads artifacts
-- ✅ Caches dependencies
-
-### On Tag Push (e.g., `v1.0.0`)
-- ✅ Everything above, plus:
-- ✅ Creates GitHub Release
-- ✅ Triggers Render deployment
-
-### Creating a Release
 ```bash
 git tag v1.0.0
 git push origin v1.0.0
-# → Build → Release → Deploy to Render
+# → Builds mod → Creates GitHub release with JAR
 ```
 
-## Server Configuration
-
-### Default Specifications
-- **Memory**: 4GB RAM (configurable)
-- **Minecraft**: 1.20.1
-- **NeoForge**: 47.1.106
-- **Port**: 25565
-- **Max Players**: 20
-- **Difficulty**: Hard
-- **View Distance**: 10 chunks
-
-### Performance Optimizations
-The Dockerfile includes Aikar's JVM flags:
-- G1GC garbage collector
-- Optimized heap settings
-- Reduced pause times
-- Better memory management
-
-## Cost Estimation
-
-Render pricing (as of 2024):
-- **Free Tier**: 750 hours/month (not suitable for 24/7 servers)
-- **Starter**: $7/month (512MB RAM - too small)
-- **Standard**: $25/month (4GB RAM) - **Recommended**
-- **Pro**: $85/month (8GB RAM)
-
-**Estimated costs:**
-- 4GB server (Standard): $25/month
-- Persistent disk (10GB): Included
-- Includes 24/7 uptime
-
-**Note**: Minecraft servers need at least 4GB RAM. Use Standard plan.
-
-## Connecting to Your Server
-
-### After Deployment
-
-Render will provide a **public hostname** for your server!
-
-1. **Get Server Address**
-   - Render Dashboard → Your service
-   - Look for external hostname (e.g., `mirda-minecraft-server-xxxx.onrender.com`)
-   - Port: 25565 (default Minecraft port)
-   - Full address: `your-hostname.onrender.com:25565`
-
-2. **Connect in Minecraft**
-   - Open Minecraft 1.20.1 with NeoForge 47.1.106
-   - Multiplayer → Add Server
-   - Server Address: `your-hostname.onrender.com:25565`
-   - Save and connect!
-
-3. **Test Mirda**
-   ```
-   /summon_mirda_altar
-   ```
-
-**See [CONNECTING.md](CONNECTING.md) for detailed connection guide and troubleshooting.**
-
-### Understanding "Private Service"
-
-Don't worry - "Private Service" on Render **does NOT mean inaccessible**!
-
-- ✅ Still publicly accessible via TCP
-- ✅ Players can connect from anywhere on the internet
-- ❌ Just means it's not HTTP/web-based
-- ✅ Perfect for Minecraft servers
-
-The term "private" means it's not a web service, but it's fully accessible for game connections!
-
-## Managing Your Server
-
-### View Logs
-In Render Dashboard:
-- Go to your service
-- Click "Logs" tab
-- Real-time streaming logs
-
-### Restart Server
-- Dashboard → Your service → "Manual Deploy" → "Clear build cache & deploy"
-
-### Update Environment Variables
-- Dashboard → Your service → "Environment"
-- Edit variables
-- Save (auto-redeploys)
-
-### Access Shell
-- Dashboard → Your service → "Shell"
-- Opens terminal in container
+---
 
 ## Server Administration
 
-### Making Yourself OP
+### Essential Commands (after becoming OP)
 
-1. **Via Environment Variables**
-   ```
-   OPS=YourMinecraftUsername
-   ```
-   Redeploy after adding
-
-2. **Via Shell** (Dashboard → Shell)
-   ```bash
-   screen -r  # Attach to Minecraft console
-   op YourMinecraftUsername
-   # Press Ctrl+A then D to detach
-   ```
-
-### Server Commands
-Once OP:
-- `/summon_mirda_altar` - Spawn Mirda's altar
-- `/give @s mirdamod:bocow` - Get Mirda's weapon
-- `/give @s mirdamod:altar_compass` - Get altar compass
-
-## Troubleshooting
-
-### Build Fails
-- Check Dockerfile syntax
-- Verify Java 17 is being used
-- Review build logs in Render dashboard
-
-### Server Won't Start
-- Check memory allocation (minimum 4GB)
-- Verify NeoForge version matches Minecraft
-- Review server logs for errors
-
-### Can't Connect
-- Verify service is running (Dashboard → Status)
-- Check port 25565 is exposed
-- Wait 2-5 minutes for server startup
-- Use correct address format: `host:25565`
-
-### Out of Memory
-- Upgrade to larger instance (8GB)
-- Reduce `VIEW_DISTANCE` or `MAX_PLAYERS`
-- Check for memory leaks in logs
-
-### Slow Performance
-- Upgrade instance type
-- Reduce view distance
-- Lower max players
-- Check TPS in-game
-
-## Advanced Configuration
-
-### Custom Server Properties
-
-Add to environment variables:
-```
-SERVER_PROPERTIES=server-port=25565\nonline-mode=true\ndifficulty=hard
+```bash
+/summon_mirda_altar          # Spawn Mirda's altar
+/give @s mirdamod:bocow      # Get Mirda's weapon
+/give @s mirdamod:altar_compass  # Get altar compass
+/give @s mirdamod:crystal_heart  # Get crystal heart
+/op PlayerName               # Make player OP
+/whitelist add PlayerName    # Add to whitelist
 ```
 
-Or modify in Dockerfile:
-```dockerfile
-RUN echo "your-property=value" >> server.properties
+### Becoming OP
+
+**FalixNodes:** Panel → Console → type `op YourUsername`
+
+**Oracle Cloud:**
+```bash
+# Attach to screen/tmux
+screen -r minecraft
+op YourUsername
+# Ctrl+A, D to detach
 ```
 
-### Adding More Mods
+**Aternos:** Console tab → type `op YourUsername`
 
-1. **Create `extra_mods/` directory**
-2. **Add mod JARs**
-3. **Update Dockerfile**:
-   ```dockerfile
-   COPY extra_mods/*.jar /minecraft/mods/
-   ```
-4. **Push and redeploy**
+**Railway:** Deploy with `OPS=YourUsername` environment variable
 
-### Using Custom World
+---
 
-1. **Create `world/` directory with world files**
-2. **Update Dockerfile**:
-   ```dockerfile
-   COPY world/ /minecraft/world/
-   ```
-3. **Use persistent disk** to preserve between deploys
+## Performance Optimization
 
-## Monitoring
+### Server Properties
 
-### Render Dashboard
-- CPU usage graphs
-- Memory usage graphs
-- Network traffic
-- Deployment history
-- Error logs
+Edit `server.properties`:
+```properties
+view-distance=10        # Lower for better performance (6-8)
+max-players=20          # Adjust to your needs
+difficulty=hard         # Boss fights are harder
+enable-command-block=true
+```
 
-### In-Game Monitoring
-- Monitor player count
-- Watch for lag
-- Check server console for errors
+### JVM Flags (Aikar's Flags)
 
-## Backup & Restore
+The Dockerfile includes optimized flags:
+```bash
+java -Xmx4G -Xms2G \
+  -XX:+UseG1GC \
+  -XX:+ParallelRefProcEnabled \
+  -XX:MaxGCPauseMillis=200 \
+  -XX:+UnlockExperimentalVMOptions \
+  -XX:+DisableExplicitGC \
+  -XX:+AlwaysPreTouch \
+  -jar server.jar nogui
+```
+
+---
+
+## Cost Summary
+
+| Provider | Monthly Cost | RAM | Setup | Public Access |
+|----------|-------------|-----|-------|---------------|
+| FalixNodes | $0 | 4GB | Easy | Yes |
+| Oracle Cloud | $0 | 24GB | Hard | Yes |
+| Aternos | $0 | Variable | Easy | Yes (with queue) |
+| Railway | $1-5 | 8GB | Medium | Yes |
+| **Render** | N/A | N/A | N/A | **NO (Internal only)** |
+
+---
+
+## Advanced: Render (Internal/VPN Only)
+
+**WARNING: Render Private Services are NOT publicly accessible from the internet.**
+
+Render is only suitable if you:
+- Need internal service-to-service communication
+- Will configure VPN/tunnel (Tailscale, WireGuard, ngrok)
+- Understand that players CANNOT connect directly
+
+### Why Render Doesn't Work for Public Gaming
+
+1. **Private Services** have no public IP
+2. **Web Services** only expose HTTP/HTTPS (ports 80/443)
+3. No raw TCP port exposure to internet
+4. Internal hostname only reachable within Render network
+
+### If You Must Use Render
+
+1. **Deploy as Private Service** (using `render.yaml`)
+2. **Install VPN on Render Service:**
+   - Add Tailscale to Dockerfile
+   - Configure Tailscale network key
+3. **All Players Install VPN:**
+   - Each player installs Tailscale
+   - Joins your Tailscale network
+4. **Connect via VPN IP:**
+   - Use Tailscale IP, not public hostname
+   - Only works for players on your VPN
+
+**This is NOT recommended.** FalixNodes or Oracle Cloud are free and much easier.
+
+### Render Configuration Files
+
+The repository includes for advanced users:
+- `render.yaml` - Infrastructure as Code
+- `watchdog.sh` - Auto-shutdown for cost savings
+- `Dockerfile` - Container configuration
+
+These are useful for:
+- Reference Docker setup
+- Internal development environments
+- Users with VPN infrastructure
+- Cost optimization ideas
+
+---
+
+## Backup Strategies
 
 ### Manual Backup
 
-Via Render Shell:
 ```bash
-tar -czf world-backup.tar.gz world/
-# Download via Render file browser or scp
+# FalixNodes: Use File Manager to download world folder
+# Oracle Cloud:
+tar -czf world-backup-$(date +%Y%m%d).tar.gz world/
+# Download via SCP
+
+# Aternos: Files → Download world
 ```
 
-### Automatic Backups
+### Automated Backups (Oracle Cloud)
 
-Render doesn't have built-in backups for disks. Options:
-1. **Manual periodic backups** via shell
-2. **S3 sync** script in cron
-3. **External backup service**
-
-### Persistent Disk
-
-Render's persistent disk survives redeploys:
-- World data saved
-- Player data preserved
-- Server settings maintained
-
-## Security
-
-- ✅ Online mode enabled (no cracked clients)
-- ✅ Whitelist support via environment
-- ✅ OP permissions for admin commands
-- ✅ No sensitive data in repository
-- ⚠️ Keep deploy hook URL secret
-
-## Render-Specific Features
-
-### Auto-Deploy
-- Push to main → automatic deployment
-- Uses `render.yaml` for config
-- Zero-downtime deploys (optional)
-
-### Health Checks
-Built into Dockerfile:
-```dockerfile
-HEALTHCHECK --interval=30s CMD pgrep -f "java.*server.jar"
-```
-
-### Persistent Disks
-- Survives redeploys
-- 10GB default (configurable)
-- Mounted at `/minecraft`
-
-## Local Development
-
-### Test Dockerfile Locally
 ```bash
-docker build -t mirda-server .
-docker run -p 25565:25565 -v minecraft-data:/minecraft mirda-server
+# Add to crontab
+0 4 * * * tar -czf /backups/world-$(date +\%Y\%m\%d).tar.gz /home/opc/minecraft/world/
 ```
 
-### Test with Render CLI (if available)
-```bash
-render deploy
-```
+### Sync Between Providers
 
-## Updating the Mod
+Keep world data synced for failover:
+1. Download from primary provider
+2. Upload to backup provider
+3. Update DNS to switch
 
-1. **Make code changes**
-2. **Commit and push**
-   ```bash
-   git commit -am "Update mod"
-   git push
-   ```
-3. **Render auto-deploys** from main branch
-4. **Or trigger manually** via deploy hook
+---
 
-## Production Checklist
+## Troubleshooting
 
-Before going live:
-- [ ] Set `MEMORY=4G` minimum
-- [ ] Configure `OPS` with admin usernames
-- [ ] Set `ONLINE_MODE=true`
-- [ ] Adjust `MAX_PLAYERS` for your community
-- [ ] Set meaningful `MOTD`
-- [ ] Add persistent disk (10GB+)
-- [ ] Test connection externally
-- [ ] Verify Mirda spawns: `/summon_mirda_altar`
-- [ ] Set up backups
-- [ ] Monitor costs in Render dashboard
+### Server Won't Start
 
-## Render Alternatives
+- **Check memory:** Minimum 2GB, recommended 4GB
+- **Verify Java version:** Must be Java 17
+- **Check NeoForge:** Version 47.1.106 for MC 1.20.1
+- **Review logs:** Look for errors in console
 
-If Render doesn't fit:
-- **AWS ECS**: More control, complex setup
-- **DigitalOcean App Platform**: Similar to Render
-- **Google Cloud Run**: Not ideal for Minecraft
-- **Self-hosting**: Your own hardware
+### Players Can't Connect
 
-## Support
+- **Verify server running:** Check process/panel status
+- **Firewall rules:** Ensure port 25565 is open
+- **Correct address:** Include port if non-standard
+- **Version match:** All players need MC 1.20.1 + NeoForge 47.1.106
 
-- **Render Issues**: [Render Community](https://community.render.com)
-- **Render Docs**: [render.com/docs](https://render.com/docs)
-- **Mod Issues**: GitHub Issues
-- **Minecraft**: [Minecraft Forums](https://www.minecraftforum.net/)
+### Mod Not Loading
 
-## render.yaml Reference
+- **Check mods folder:** JAR must be in correct location
+- **File permissions:** Ensure readable
+- **NeoForge version:** Must match server and client
+- **No duplicate mods:** Remove old versions
 
-The included `render.yaml` defines:
-```yaml
-services:
-  - type: pserv              # Private Service (non-HTTP)
-    name: mirda-minecraft-server
-    env: docker              # Use Dockerfile
-    dockerfilePath: ./Dockerfile
-    envVars: [...]           # All server config
-    disk:
-      name: minecraft-data   # Persistent storage
-      mountPath: /minecraft
-      sizeGB: 10
-    plan: standard           # 4GB RAM
-```
+---
 
-## License
+## Next Steps
 
-Minecraft server hosting must comply with [Minecraft EULA](https://www.minecraft.net/en-us/eula).
+1. **Choose provider** based on your needs
+2. **Deploy server** using instructions above
+3. **Upload Mirda mod** JAR
+4. **Configure server settings**
+5. **Test with `/summon_mirda_altar`**
+6. **Share server address** with players
+7. **Optional:** Configure Cloudflare DNS
+
+See also:
+- [CONNECTING.md](CONNECTING.md) - Player connection guide
+- [MULTI_PROVIDER.md](MULTI_PROVIDER.md) - Multi-provider strategy
+- [FREE_TIER.md](FREE_TIER.md) - Cost optimization
+- [README.md](README.md) - Mod features

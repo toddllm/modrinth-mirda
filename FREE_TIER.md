@@ -1,184 +1,315 @@
-# Free Tier Optimization Guide
+# Free Tier Hosting Guide
 
-This guide helps you run the Mirda Minecraft server on Render while staying within free tier limits (750 hours/month).
+This guide helps you run the Mirda Minecraft server for **$0/month** using free-tier cloud providers.
 
-## Understanding Render Free Tier
+## Important: Render Limitations
 
-**Free Tier Limits:**
-- 750 hours/month of service runtime
-- 512MB RAM (NOT enough for Minecraft)
-- Services spin down after 15 minutes of inactivity (web services only)
+**Render Private Services are NOT publicly accessible from the internet.**
 
-**Reality for Minecraft:**
-- Minecraft needs minimum 2-4GB RAM
-- Private services (required for Minecraft) don't auto-suspend
-- **You'll need a paid plan, BUT can minimize costs**
+Render cannot be used for public Minecraft servers because:
+- Private Services have no public IP address
+- Web Services only expose HTTP/HTTPS (ports 80/443), not game ports
+- Players cannot connect directly to a Render Private Service
+- Internal networking only works between Render services
 
-## Cost Optimization Strategy
+**Render is only suitable for:**
+- Internal services (databases, APIs)
+- VPN/tunnel-based access (Tailscale, WireGuard)
+- Advanced users who configure their own networking layer
 
-### Option 1: Auto-Shutdown When Idle (Included)
+See [MULTI_PROVIDER.md](MULTI_PROVIDER.md) for the recommended multi-provider strategy.
 
-The server now includes a **watchdog script** that automatically shuts down when no players are online.
+---
 
-**How it works:**
-1. Monitors player count every 60 seconds
-2. If 0 players for 30 minutes → auto-shutdown
-3. Server stops, Render stops billing
-4. Manually restart when you want to play
+## Truly Free Hosting Options
 
-**Configuration (via environment variables):**
-```yaml
-IDLE_MINUTES: 30        # Shutdown after 30 min of no players
-CHECK_INTERVAL: 60      # Check every 60 seconds
-```
+### Option 1: FalixNodes (Recommended for Easy Setup)
 
-**Example Cost Savings:**
-- Play 4 hours/day = ~120 hours/month
-- Standard plan ($25/month) = $0.034/hour
-- Monthly cost: ~$4 instead of $25! ✅
+**Cost: $0/month forever**
 
-### Option 2: Manual Start/Stop
+**Resources:**
+- 4 GB RAM (perfect for modded Minecraft)
+- NeoForge support included
+- DDoS protection
+- FTP access
 
-**Disable auto-deploy** to prevent automatic restarts:
-```yaml
-autoDeploy: false  # Already set in render.yaml
-```
+**Setup:**
+1. Create account at [FalixNodes](https://falixnodes.net)
+2. Create new Minecraft server
+3. Select NeoForge 1.20.1 (version 47.1.106)
+4. Upload Mirda mod JAR via web panel or FTP
+5. Start server
+6. Share IP:port with players
 
-**Start server manually:**
-1. Go to Render Dashboard
-2. Your service → "Manual Deploy"
-3. Deploy latest
-4. Server starts, play session begins
+**Pros:**
+- Purpose-built for Minecraft
+- Easy mod installation
+- No queue or waiting
+- Free forever
 
-**Stop server when done:**
-1. Dashboard → Shell
-2. Run: `pkill -f "java.*server.jar"`
-3. Server stops, billing stops
+**Cons:**
+- Shared resources (occasional lag)
+- Limited server locations
 
-### Option 3: Scheduled Server Times
+---
 
-Add cron-based startup for specific hours:
+### Option 2: Oracle Cloud Always Free (Best Performance)
 
-```dockerfile
-# Add to Dockerfile
-RUN echo "0 18 * * * /start-server.sh" >> /etc/crontab
-RUN echo "0 23 * * * pkill -f 'java.*server.jar'" >> /etc/crontab
-```
+**Cost: $0/month forever**
 
-Server runs:
-- 6 PM to 11 PM daily = 5 hours/day
-- ~150 hours/month
-- Cost: ~$5/month
+**Resources:**
+- 4 OCPUs (ARM Ampere A1)
+- 24 GB RAM total
+- 200 GB storage
+- 24/7 uptime
 
-## Monitoring Usage
-
-### Render Dashboard
-- View service runtime hours
-- Check current billing cycle usage
-- Monitor costs in real-time
-
-### Command to Check Server Status
+**Setup:**
 ```bash
-# Via Render Shell
-pgrep -f "java.*server.jar" && echo "Server running" || echo "Server stopped"
+# SSH into Oracle VM
+ssh ubuntu@your-vm-ip
+
+# Install Java 17 (ARM64)
+sudo apt update
+sudo apt install openjdk-17-jdk-headless
+
+# Download NeoForge installer
+wget https://maven.neoforged.net/releases/net/neoforged/neoforge/47.1.106/neoforge-47.1.106-installer.jar
+
+# Install server
+java -jar neoforge-47.1.106-installer.jar --installServer
+
+# Create mods folder
+mkdir mods
+
+# Upload Mirda mod JAR
+scp mirdamod-1.0.0.jar ubuntu@your-vm-ip:~/mods/
+
+# Accept EULA
+echo "eula=true" > eula.txt
+
+# Run server
+java -Xmx4G -Xms2G -jar server.jar nogui
 ```
 
-## Recommended Setup for Budget
-
-**Best approach:**
-1. ✅ Use auto-shutdown (included)
-2. ✅ Set `IDLE_MINUTES=30` (or lower)
-3. ✅ Disable auto-deploy (`autoDeploy: false`)
-4. ✅ Manual start when you want to play
-5. ✅ Let watchdog stop it when done
-
-**Monthly cost estimate:**
-- Play 3-4 hours/day
-- ~100-120 hours/month
-- **~$3-4/month** instead of $25
-
-## Alternative: Free Tier Workarounds
-
-### Use Render Free Web Service + External Server
-
-**Not recommended** but possible:
-1. Host website on Render free tier
-2. Run actual Minecraft server elsewhere (free):
-   - Oracle Cloud (always free tier, 4GB ARM instance)
-   - Google Cloud (free $300 credit)
-   - AWS Free Tier (12 months, t2.micro)
-
-### Ngrok Tunnel (Local Hosting)
-
-**Free option:**
-1. Run server on your PC
-2. Use ngrok for public access
-3. Only run when you're playing
-4. $0/month
-
-## Free Tier Comparison
-
-| Platform | Free Tier | Minecraft Viable? | Notes |
-|----------|-----------|-------------------|-------|
-| **Render** | 750hrs/month, 512MB | ❌ Need paid ($25/mo) | But can optimize to $3-4/mo |
-| **Oracle Cloud** | Always free, 4GB ARM | ✅ Yes | Best free option |
-| **Railway** | $5 credit/mo | ⚠️ Limited | ~50-80 hrs/month |
-| **Fly.io** | 3 VMs free | ⚠️ Limited RAM | 256MB each |
-| **AWS** | 12 months free | ✅ t2.micro | After 12mo: paid |
-
-## Recommended: Oracle Cloud Free Tier
-
-For **truly free** 24/7 Minecraft hosting:
-
-1. **Oracle Cloud Always Free:**
-   - ARM-based Ampere A1 instance
-   - 4 OCPUs, 24GB RAM (can use 4GB for Minecraft)
-   - Always free, no time limit
-   - No credit card charges
-
-2. **Setup:**
-   ```bash
-   # SSH to Oracle instance
-   # Install Docker
-   # Use same Dockerfile from this repo
-   docker run -p 25565:25565 -v minecraft-data:/minecraft mirda-server
-   ```
-
-3. **Cost:** $0/month forever ✅
-
-## Summary
-
-**For Render:**
-- ✅ Use auto-shutdown watchdog (included)
-- ✅ Set low idle timeout (15-30 min)
-- ✅ Manual deploy when needed
-- ✅ Cost: ~$3-5/month for casual play
-
-**For Free 24/7:**
-- ✅ Use Oracle Cloud Always Free
-- ✅ Same Docker setup
-- ✅ Cost: $0/month
-
-## Configuration
-
-The watchdog is already configured in:
-- `watchdog.sh` - Auto-shutdown script
-- `Dockerfile` - Runs watchdog alongside server
-- `render.yaml` - Environment variables for tuning
-
-**To adjust idle timeout:**
-```yaml
-# In render.yaml
-IDLE_MINUTES: 15  # Shutdown after 15 min (more aggressive)
+**Firewall Configuration:**
+```bash
+# Oracle Cloud console: Add ingress rule for TCP 25565
+# Then on VM:
+sudo iptables -I INPUT -p tcp --dport 25565 -j ACCEPT
+sudo netfilter-persistent save
 ```
 
-**To disable watchdog:**
-```yaml
-IDLE_MINUTES: 0   # Disables auto-shutdown
+**Systemd Service (for auto-restart):**
+```bash
+sudo nano /etc/systemd/system/minecraft.service
 ```
 
-## Questions?
+```ini
+[Unit]
+Description=Minecraft Server
+After=network.target
 
-- **Render billing**: [Render Pricing](https://render.com/pricing)
-- **Oracle free tier**: [Oracle Cloud Free Tier](https://www.oracle.com/cloud/free/)
-- **Mod issues**: GitHub Issues
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/usr/bin/java -Xmx4G -Xms2G -jar server.jar nogui
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl enable minecraft
+sudo systemctl start minecraft
+```
+
+**Pros:**
+- Massive resources (24GB RAM)
+- Full VM control
+- 24/7 operation
+- Best performance of free options
+
+**Cons:**
+- Requires credit card (not charged)
+- Complex initial setup
+- ARM architecture (but Java works fine)
+
+---
+
+### Option 3: Aternos (Backup/Casual)
+
+**Cost: $0/month**
+
+**Resources:**
+- Variable RAM
+- 4 GB world size limit
+- NeoForge support
+
+**Setup:**
+1. Create account at [Aternos](https://aternos.org)
+2. Create new server
+3. Select NeoForge 1.20.1
+4. Upload Mirda mod via Files tab
+5. Start server (wait in queue)
+6. Connect via Aternos launcher
+
+**Pros:**
+- Zero setup complexity
+- Automatic mod compatibility
+- No cost ever
+
+**Cons:**
+- Queue wait times (5-15 minutes)
+- Auto-shutdown after inactivity
+- 4 GB world limit
+
+**Best for:** Backup server or casual play
+
+---
+
+## Cost Comparison
+
+| Provider | Monthly Cost | RAM | 24/7? | Setup Difficulty | Best For |
+|----------|-------------|-----|-------|------------------|----------|
+| **FalixNodes** | $0 | 4GB | Yes | Easy | Primary server |
+| **Oracle Cloud** | $0 | 24GB | Yes | Hard | High performance |
+| **Aternos** | $0 | Variable | No | Easy | Backup/casual |
+| **Railway** | $1-5 | 8GB | Yes | Medium | Paid convenience |
+| **Render** | N/A | N/A | N/A | N/A | **NOT usable** |
+
+---
+
+## Using Cloudflare DNS
+
+Combine providers with a single domain:
+
+1. **Register domain** (optional, ~$10-15/year)
+2. **Add to Cloudflare** (free)
+3. **Point to active provider:**
+
+```
+Type: A
+Name: play
+IPv4: <provider-ip>
+Proxy: OFF (required for game traffic)
+
+Type: SRV
+Name: _minecraft._tcp.play
+Port: 25565
+Target: play.yourdomain.com
+```
+
+**Switching providers:** Just update the A record IP
+
+**Players always connect to:** `play.yourdomain.com`
+
+---
+
+## Watchdog Auto-Shutdown (Optional)
+
+For providers that charge by usage (not free-tier), the watchdog script saves money:
+
+```bash
+#!/bin/bash
+# watchdog.sh - Monitors player count and shuts down when idle
+
+IDLE_MINUTES=${IDLE_MINUTES:-30}
+CHECK_INTERVAL=${CHECK_INTERVAL:-60}
+
+idle_time=0
+
+while true; do
+    sleep $CHECK_INTERVAL
+
+    # Check player count
+    player_count=$(echo "list" | screen -S minecraft -p 0 -X stuff "$(printf '\r')" 2>/dev/null | grep -oP '\d+(?= players)')
+
+    if [ "$player_count" -eq 0 ]; then
+        idle_time=$((idle_time + CHECK_INTERVAL))
+        if [ $idle_time -ge $((IDLE_MINUTES * 60)) ]; then
+            echo "Idle timeout. Shutting down..."
+            screen -S minecraft -X quit
+            exit 0
+        fi
+    else
+        idle_time=0
+    fi
+done
+```
+
+**Useful for:**
+- Railway (pay-per-use after trial)
+- Self-hosted VPS with metered billing
+- NOT needed for FalixNodes, Oracle Cloud, or Aternos (always free)
+
+---
+
+## Recommended Strategy
+
+**Primary Server: FalixNodes**
+- Easy setup, no queue
+- 4GB RAM handles Mirda mod
+- Free forever
+- Good for regular play
+
+**Backup Server: Aternos**
+- Use when FalixNodes is down
+- Accept queue wait time
+- Free, no setup
+
+**Migration Path: Oracle Cloud**
+- Best performance available
+- 24/7 with no interruptions
+- Worth the initial setup effort
+
+**Optional: Custom Domain via Cloudflare**
+- Professional look: `play.mirda.games`
+- Easy provider switching
+- $10-15/year for domain
+
+---
+
+## What About Render?
+
+The `render.yaml` and `watchdog.sh` files remain in this repository for:
+
+1. **Internal services** - Backend APIs that don't need public access
+2. **VPN setups** - If you configure Tailscale/WireGuard tunneling
+3. **Advanced users** - Who understand networking limitations
+4. **Reference** - Docker configuration is still useful for other providers
+
+**DO NOT** expect to deploy to Render and have players connect publicly. It will not work.
+
+---
+
+## Quick Start
+
+1. **Choose provider:**
+   - Easy setup → FalixNodes
+   - Best performance → Oracle Cloud
+   - Just testing → Aternos
+
+2. **Set up server:**
+   - Install NeoForge 1.20.1 (47.1.106)
+   - Upload Mirda mod JAR
+   - Configure server.properties
+   - Open port 25565 (if needed)
+
+3. **Share with players:**
+   - Direct IP:port, or
+   - Custom domain via Cloudflare
+
+4. **Cost: $0/month**
+
+---
+
+## Further Reading
+
+- [MULTI_PROVIDER.md](MULTI_PROVIDER.md) - Complete multi-provider strategy
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Detailed deployment guides
+- [CONNECTING.md](CONNECTING.md) - Player connection instructions
+- [Oracle Cloud Free Tier](https://www.oracle.com/cloud/free/)
+- [FalixNodes](https://falixnodes.net)
+- [Aternos](https://aternos.org)

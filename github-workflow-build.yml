@@ -65,10 +65,15 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy-to-render:
+  # Optional: Deploy to Railway (paid service after trial)
+  # Railway provides public TCP access for Minecraft servers
+  # To use: Add RAILWAY_TOKEN secret to your repository
+  deploy-to-railway:
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    if: |
+      (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) &&
+      github.event_name != 'pull_request'
 
     steps:
     - name: Checkout code
@@ -80,8 +85,11 @@ jobs:
         name: mirda-mod-jar
         path: build/libs/
 
-    - name: Deploy to Render
-      run: |
-        curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+    - name: Install Railway CLI
+      run: npm install -g @railway/cli
+
+    - name: Deploy to Railway
+      if: ${{ secrets.RAILWAY_TOKEN != '' }}
+      run: railway up --detach
       env:
-        RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
